@@ -1333,3 +1333,23 @@ true)` then the drop or (after our own no/yes picker) the destroy. Verified live
   neither build drops the other's keys.
 - Fork tags are v<upstream>-pad.N; core/update_check now compares semver pre-release identifiers (it used to ignore the
   suffix, so pad.1 vs pad.2 compared equal). Never push upstream's tags here: a v* tag push publishes a release.
+
+## 2026-11-19: game patch 1.3.1.1 -> 1.3.1.2 (fork), second relocation
+- New build (Steam 2026-11-16, buildid 26655545): exe 0x6af77535, Engine 0x6af7742e, Game 0x6af774a6 (archived as
+  `1.3.1.2-6af77535`). No 1.3.1.1 archive existed and the Betas tab offers no 1.3.x rollback: the old build came back
+  through the Steam console, `download_depot 219990 219991 382249031910927652` (the old manifest id was still in
+  `Steam\depotcache\219991_*.manifest`), run from that folder with a steam_appid.txt to dump it, archived as
+  `1.3.1.1-6ac7f680` (all 18 signatures matched the dump first).
+- Exports: gd_names.h byte-identical. Signature changes we do not use: SkillManager::GetCharAttributes /
+  GetOffensiveModifierAttributes and Character::SkillWarmUp gained a bool; Player::CalculatePet* removed.
+- exe_reloc: 7991 functions matched, every constant/evidence mapped except one leaf, no evidence or vtable slot
+  disagreed. The three CHANGED functions (App::ApplyPendingState, InGameUI::HandleKeyAction, the edit box key handler
+  exe+0xee060) differ only in inline switch tables: index bytes identical, every dword target shifted by the function's
+  own delta, so the action ids hold. The unmapped leaf is the node->DisplayWidget thunk: 0xc324c -> 0xc362c, the only
+  `48 83 e9 08 e9` in the new image jumping to the relocated mouse handler (0xbef10 -> 0xbeff0). 18/18 signatures match.
+  Fixed `--apply --force` (it passed `--force` to the scanner as a file name).
+- World layer: every ctor on the CLAUDE.md list (+ SkillBuff, Monster) identical. vtcmp identical for Object, Character,
+  Player, Pet, Skill, HotSlotOption(Skill), ControllerPlayer, Entity's Object table; the Monster/Pet ICrowdAgent and
+  Monster Object "DIFF"s start past the class's real slot count (tables run together), Entity's two small tables only
+  swapped export order.
+- Live (user, driven by controller): character list, inventory, skills, constellations, factions and riftgate work.

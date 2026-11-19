@@ -4,7 +4,7 @@ Injected DLL that hooks the game's own engine exports. Design lineage: `../wotr-
 project by the same author) — see `docs/design-notes-from-wotr.md` for the decisions we carry over.
 
 ## Game facts
-- Grim Dawn v1.3.1.1 (x64), Steam build (relocated from 1.3.0.8 on 2026-10-08). Install: `C:\Program Files (x86)\Steam\steamapps\common\Grim Dawn`.
+- Grim Dawn v1.3.1.2 (x64), Steam build (relocated from 1.3.0.8 on 2026-10-08, from 1.3.1.1 on 2026-11-19). Install: `C:\Program Files (x86)\Steam\steamapps\common\Grim Dawn`.
   The 64-bit game is `x64\Grim Dawn.exe`; **its working directory must be the install root** (where
   `database.arz` and the `.arc` archives live) or it starts with no data and crashes in a string compare.
 - Closed-source C++ (Titan Quest engine lineage), split into DLLs that **export named, MSVC-decorated C++

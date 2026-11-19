@@ -588,7 +588,7 @@ static bool is_two_handed(const void* item) {
     });
   return yes;
 }
-// The exe's two-hander swap over a weapon and an off-hand (exe+0x1eb71e): room for both, both into the bag, detach
+// The exe's two-hander swap over a weapon and an off-hand (exe+0x1eb99e): room for both, both into the bag, detach
 // the off-hand, PlaceItem(RightHand, new) -- which detaches the weapon itself. Without room for both the exe holds one
 // on the cursor (we have none) or refuses; we refuse. right_id may be 0 (an off-hand alone). Runs inside a guard.
 static bool swap_in_two_hander(void* ic, void* ec, unsigned id, unsigned right_id, unsigned left_id, bool* no_room) {
@@ -603,8 +603,8 @@ static bool swap_in_two_hander(void* ic, void* ec, unsigned id, unsigned right_i
   g.Equip_PlaceItem(ec, kRightHand, id, false, false);
   return true;
 }
-// The bag's right-click (exe+0x1eb310): a consumable goes through PlayerInventoryCtrl::UseItem(id, bag);
-// equipment through SmartAutoInsert + removal from the bag + re-homing whatever got displaced (exe+0x1eb636).
+// The bag's right-click (exe+0x1eb590): a consumable goes through PlayerInventoryCtrl::UseItem(id, bag);
+// equipment through SmartAutoInsert + removal from the bag + re-homing whatever got displaced (exe+0x1eb8b6).
 // SmartAutoInsert places the item itself only when it displaces at most one; for a two-hander over a weapon AND
 // an off-hand it lists both and returns true WITHOUT placing anything (Game.dll+0x277090), leaving the swap to the
 // caller (swap_in_two_hander). Trusting its true lost the two-hander and doubled the old pair (tester, 2026-10-05).
@@ -716,7 +716,7 @@ bool destroy_item(unsigned id) {
   log::writef("gameapi: destroy bag item {} ok={}", id, ok);
   return ok;
 }
-// Unequip into the bag, in the exe's order (exe+0x1eb961): room check, AddItem to the bag, then the slot's
+// Unequip into the bag, in the exe's order (exe+0x1ebbe1): room check, AddItem to the bag, then the slot's
 // RemoveItem (which only detaches -- on its own it orphans the item).
 bool unequip(int loc) {
   void* ec = equip_ctrl(); void* ic = inv_ctrl();
@@ -904,7 +904,7 @@ bool buy(unsigned market_id, unsigned item_id) {
   log::writef("gameapi: buy {} from {} -> {}", item_id, market_id, r);
   return r;
 }
-// The bag's right-click at a vendor (exe+0x1eb396): PlayerSaleRequest, then the item leaves the bag.
+// The bag's right-click at a vendor (exe+0x1eb616): PlayerSaleRequest, then the item leaves the bag.
 bool sell(unsigned market_id, unsigned item_id) {
   void* e = engine(); void* ic = inv_ctrl(); void* c = controller();
   if (!e || !ic || !c || !g.PlayerSaleRequest || !g.Inv_RemoveItem || !g.SendRemoveItemFromInventory) return false;
@@ -917,7 +917,7 @@ bool sell(unsigned market_id, unsigned item_id) {
   log::writef("gameapi: sell {} to {} -> {}", item_id, market_id, r);
   return r;
 }
-// Part of a stack. The exe's stack-split window's OK (exe+0x1dcce0, read 2026-08-26) clones the item from a
+// Part of a stack. The exe's stack-split window's OK (exe+0x1dcf60, read 2026-08-26) clones the item from a
 // copy of its ItemReplicaInfo (inline at Item+0x538, 0x190 bytes: +0 = object id, 0 = allocate a fresh one;
 // +0x178 = count) with the static Item::CreateItem, tells the character about it (SendAddItemToInventory --
 // the cursor's only lasting effect; the clone is NOT placed in the bag grid: PlayerInventoryCtrl::AddItem
@@ -1035,7 +1035,7 @@ std::vector<Bag> stash_sacks() {
   if (e && g.GetPlayerTransfer) guarded("GetPlayerTransfer", [&] { std::vector<void*> sacks = vec_items<void*>(g.GetPlayerTransfer(e), 16); for (size_t i = 0; i < sacks.size(); ++i) out.push_back(read_sack(sacks[i], 100 + (int)i)); });
   return out;
 }
-// The stash grid's shift-click (exe+0x12f1c2): out of the stash, into the bag, and the controller told.
+// The stash grid's shift-click (exe+0x12f2a2): out of the stash, into the bag, and the controller told.
 bool stash_to_bag(int sack_index, unsigned item_id) {
   void* p = player(); void* e = engine(); void* ic = inv_ctrl(); void* c = controller();
   if (!p || !e || !ic || !c || !g.Inv_AddItem) return false;
@@ -1060,7 +1060,7 @@ const void* stash_sack_vector(bool shared) {
   else { if (p && g.GetPrivateStash) guarded("GetPrivateStash", [&] { v = g.GetPrivateStash(p); }); }
   return v;
 }
-// The exe's buy handler (exe+0x1312b0 private / +0x1316d0 transfer) minus its UI: money >= cost, SubtractMoney, then
+// The exe's buy handler (exe+0x131390 private / +0x1316d0 transfer) minus its UI: money >= cost, SubtractMoney, then
 // Player::AddSack / GameEngine::AddTransferSack. The caller checks the tab count and refreshes the window (exe_ui).
 bool buy_stash_sack(bool shared, unsigned cost) {
   void* p = player(); void* e = engine();
@@ -1105,7 +1105,7 @@ bool bag_to_stash_any(unsigned item_id, bool shared) {
   log::writef("gameapi: bag item {} to {} stash (any sack) ok={}", item_id, shared ? "transfer" : "private", ok);
   return ok;
 }
-// The bag's shift-click while the caravan is open (exe+0x1eabd5): into the selected stash / transfer sack.
+// The bag's shift-click while the caravan is open (exe+0x1eae55): into the selected stash / transfer sack.
 bool bag_to_stash(unsigned item_id) {
   void* p = player(); void* e = engine(); void* ic = inv_ctrl(); void* c = controller();
   if (!p || !e || !ic || !c || !g.Inv_RemoveItem || !g.SendRemoveItemFromInventory) return false;

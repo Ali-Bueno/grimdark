@@ -1,3 +1,7 @@
+# Unreleased
+
+- Works with Grim Dawn 1.3.1.2, the Steam patch of November 16. The previous version, 1.3.1.1, is no longer supported.
+
 # 0.6.0-pad.2 (2026-11-02)
 
 - New: the controller quick menu (View or Create) has "Controller controls", the list of every button, by section. The installer has a "Controller controls" button that shows the same list.
