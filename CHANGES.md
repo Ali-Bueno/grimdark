@@ -1,4 +1,4 @@
-# Unreleased
+# 0.6.0-pad.3 (2026-11-19)
 
 - Works with Grim Dawn 1.3.1.2, the Steam patch of November 16. The previous version, 1.3.1.1, is no longer supported.
 
