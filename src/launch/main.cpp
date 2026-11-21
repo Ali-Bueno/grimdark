@@ -148,6 +148,22 @@ std::wstring quote_arg(const std::wstring& a) {
   return out + L"\"";
 }
 
+// Whichever Play option Steam picked (x64\Grim Dawn.exe, the 32-bit exe at the install root, compat\Grim Dawn.exe),
+// the mod needs the 64-bit exe of that install: the first folder up from the given exe that holds x64\Grim Dawn.exe.
+// Empty when none does (find_game then asks Steam's records as usual).
+std::wstring x64_exe_near(const std::wstring& exe) {
+  std::wstring dir = exe.substr(0, exe.find_last_of(L"\\/"));
+  for (int up = 0; up < 4 && !dir.empty(); ++up) {
+    std::wstring cand = dir + L"\\x64\\Grim Dawn.exe";
+    if (file_exists(cand)) return cand;
+    size_t slash = dir.find_last_of(L"\\/");
+    if (slash == std::wstring::npos) break;
+    dir.resize(slash);
+  }
+  printf("No x64\\Grim Dawn.exe near %ls; looking for the game the usual way.\n", exe.c_str());
+  return {};
+}
+
 // What the Steam client puts in a game's environment (GDCommunityLauncher's list): the SteamStub wrapper and
 // steam_api then treat the process as Steam-launched instead of relaunching it through Steam.
 void fake_steam_environment() {
@@ -253,8 +269,7 @@ int wmain(int argc, wchar_t** argv) {
     if (!_wcsicmp(argv[i], L"--game") && i + 1 < argc) game_arg = argv[++i];
     else if (!_wcsicmp(argv[i], L"--dry-run")) dry = true;
     else if (argv[i][0] != L'-' && file_exists(argv[i])) {   // Steam's %command%: the exe, then the game's own arguments
-      // Whichever launch option Steam picked (the 32-bit exe at the install root or x64\), the mod needs the 64-bit one.
-      game_arg = install_root_of(argv[i]) + L"\\x64\\Grim Dawn.exe";
+      game_arg = x64_exe_near(argv[i]);
       from_steam = true;
       for (int j = i + 1; j < argc; ++j) game_args += L" " + quote_arg(argv[j]);
       break;
